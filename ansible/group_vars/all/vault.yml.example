@@ -1,0 +1,6 @@
+---
+# Copy to vault.yml, set real values and encrypt it:
+#   ansible-vault encrypt group_vars/all/vault.yml
+# or create it encrypted right away with: ansible-vault create group_vars/all/vault.yml
+vault_iscsi_chap_username: "your_username"
+vault_iscsi_chap_password: "your_secure_password"

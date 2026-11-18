@@ -1,0 +1,14 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+terraform.tfvars
+crash.log
+
+# Ansible
+ansible/inventory.yml
+ansible/group_vars/all/vault.yml
+ansible/collections/
+*.retry
+.vault_pass*

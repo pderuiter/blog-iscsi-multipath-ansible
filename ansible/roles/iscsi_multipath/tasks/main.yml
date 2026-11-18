@@ -1,0 +1,58 @@
+---
+- name: Install iSCSI and multipath packages
+  ansible.builtin.apt:
+    name:
+      - open-iscsi
+      - multipath-tools
+    state: present
+    update_cache: true
+
+- name: Deploy iSCSI configuration
+  ansible.builtin.template:
+    src: iscsid.conf.j2
+    dest: /etc/iscsi/iscsid.conf
+    owner: root
+    group: root
+    mode: '0644'
+  no_log: true  # the rendered file contains the CHAP password
+
+- name: Deploy Multipath configuration
+  ansible.builtin.template:
+    src: multipath.conf.j2
+    dest: /etc/multipath.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload multipathd
+
+- name: Enable and start multipathd
+  ansible.builtin.systemd:
+    name: multipathd
+    state: started
+    enabled: true
+
+- name: Load a changed multipath configuration before logging in
+  ansible.builtin.meta: flush_handlers
+
+- name: Discover iSCSI targets
+  ansible.builtin.command: "iscsiadm -m discovery -t st -p {{ item }}"
+  loop: "{{ iscsi_target_ips }}"
+  register: iscsi_discovery
+  changed_when: false
+
+- name: Check active iSCSI sessions
+  ansible.builtin.command: "iscsiadm -m session"
+  register: iscsi_sessions
+  changed_when: false
+  failed_when: iscsi_sessions.rc not in [0, 21]  # 21 = no active sessions
+
+- name: Log in to iSCSI targets
+  ansible.builtin.command: "iscsiadm -m node -T {{ iscsi_target_name }} -p {{ item }} --login"
+  loop: "{{ iscsi_target_ips }}"
+  when: (item ~ ':3260') not in iscsi_sessions.stdout
+  changed_when: true  # only runs for portals without a session
+
+- name: Ensure iSCSI login persists across reboots
+  ansible.builtin.command: "iscsiadm -m node -T {{ iscsi_target_name }} -p {{ item }} --op=update --name=node.startup --value=automatic"
+  loop: "{{ iscsi_target_ips }}"
+  changed_when: false

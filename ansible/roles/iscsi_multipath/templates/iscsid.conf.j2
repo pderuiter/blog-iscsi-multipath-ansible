@@ -1,0 +1,10 @@
+iscsid.startup = /bin/systemctl start iscsid.socket
+
+node.startup = automatic
+node.leading_login = No
+
+node.session.auth.authmethod = CHAP
+node.session.auth.username = {{ iscsi_chap_username }}
+node.session.auth.password = {{ iscsi_chap_password }}
+
+node.session.scan = auto

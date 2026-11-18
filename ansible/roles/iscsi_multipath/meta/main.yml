@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  role_name: iscsi_multipath
+  namespace: blog
+  author: Patrick de Ruiter
+  description: iSCSI initiator with dm-multipath over two portals (the role from the blog post)
+  license: MIT
+  min_ansible_version: "2.17"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - noble
+  galaxy_tags:
+    - iscsi
+    - multipath
+    - storage
+dependencies: []

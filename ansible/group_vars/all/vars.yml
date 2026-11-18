@@ -1,0 +1,21 @@
+---
+# Both portals of the target: one per storage network (the post's IP1/IP2).
+iscsi_target_ips:
+  - "10.0.10.11"
+  - "10.0.20.11"
+iscsi_target_name: "iqn.2025-03.com.example:storage"
+iscsi_chap_username: "{{ vault_iscsi_chap_username }}"
+iscsi_chap_password: "{{ vault_iscsi_chap_password }}"
+
+# Target side (role iscsi_target), so you can build both ends.
+iscsi_target_iqn: "{{ iscsi_target_name }}"
+iscsi_target_portals: "{{ iscsi_target_ips }}"
+iscsi_target_luns:
+  - name: lun0
+    device: /dev/sdb  # the second disk of the target VM (scsi1)
+    wwn: "c0ffee00-1234-4abc-8def-0123456789ab"
+# One ACL per initiator, using the IQN read from each initiator in site.yml.
+iscsi_target_initiators: "{{ groups['iscsi_initiators'] | map('extract', hostvars, 'iscsi_initiator_iqn') | list }}"
+iscsi_target_chap_enabled: true
+iscsi_target_chap_username: "{{ iscsi_chap_username }}"
+iscsi_target_chap_password: "{{ iscsi_chap_password }}"
