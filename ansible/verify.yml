@@ -3,8 +3,6 @@
 - name: Verify iSCSI multipathing
   hosts: iscsi_initiators
   become: true
-  vars:
-    verify_wwid: "{{ '36001405' ~ (iscsi_target_luns[0].wwn | replace('-', ''))[:25] }}"
   tasks:
     - name: Check active iSCSI sessions
       ansible.builtin.command:
@@ -22,7 +20,7 @@
       ansible.builtin.assert:
         that:
           - iscsi_target_ips | select('in', verify_sessions.stdout) | list | length == iscsi_target_ips | length
-          - verify_multipath.stdout is search('^mpatha \(' ~ verify_wwid ~ '\)', multiline=True)
+          - verify_multipath.stdout is search('^mpatha \(' ~ iscsi_wwid ~ '\)', multiline=True)
           - verify_multipath.stdout is search("policy='round-robin 0'")
           - verify_multipath.stdout | regex_findall('active ready running') | length == iscsi_target_ips | length
         quiet: true

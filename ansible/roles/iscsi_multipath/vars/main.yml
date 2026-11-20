@@ -1,5 +1,0 @@
----
-# The blog post retrieves the WWID with `multipath -ll` and pastes it here. With the
-# iscsi_target role from this repository the LUN serial is fixed (iscsi_target_luns[0].wwn),
-# so the WWID is known in advance: "36001405" + the first 25 hex digits of the wwn.
-iscsi_wwid: "{{ '36001405' ~ (iscsi_target_luns[0].wwn | replace('-', ''))[:25] }}"

@@ -6,3 +6,6 @@ iscsi_target_ips:
 iscsi_target_name: "iqn.2025-03.com.example:storage"
 iscsi_chap_username: "{{ vault_iscsi_chap_username }}"
 iscsi_chap_password: "{{ vault_iscsi_chap_password }}"
+
+# Required: the WWID of your LUN, see "Finding the WWID".
+iscsi_wwid: ""

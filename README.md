@@ -54,10 +54,11 @@ needs an unused disk for the LUN and an address on each storage network.
    `rtslib-fb-targetctl` service;
 3. the play from the post (`iscsi_multipath`), limited to the `iscsi_initiators` group.
 
-The post retrieves the WWID with `multipath -ll` and pastes it into `vars/main.yml`. Here the target
-gives the LUN a fixed serial (`iscsi_target_luns[0].wwn`), so `vars/main.yml` computes the WWID:
-`36001405` followed by the first 25 hex digits of the `wwn` without dashes. If you use your own
-target, replace it with the WWID from `multipath -ll`.
+The role needs the LUN WWID in `iscsi_wwid`. Its default is empty, and the role's first task stops
+the run with a message until you set it. The post retrieves the WWID with `multipath -ll` and sets it
+in the inventory. Here the target gives the LUN a fixed serial (`iscsi_target_luns[0].wwn`), so
+`group_vars/all/vars.yml` computes the WWID: `36001405` followed by the first 25 hex digits of the
+`wwn` without dashes. If you use your own target, replace it with the WWID from `multipath -ll`.
 
 ## Variables
 
@@ -68,6 +69,7 @@ Set in `ansible/group_vars/all/vars.yml`:
 | `iscsi_target_ips` | `10.0.10.11`, `10.0.20.11` | Both target portals (from the post) |
 | `iscsi_target_name` | `iqn.2025-03.com.example:storage` | Target IQN (from the post) |
 | `iscsi_chap_username` / `iscsi_chap_password` | from vault | CHAP credentials (`vault_iscsi_chap_*` in `vault.yml`) |
+| `iscsi_wwid` | computed from `iscsi_target_luns[0].wwn` | LUN WWID for `multipath.conf` (required; the role default is empty) |
 | `iscsi_target_luns` | `/dev/sdb` as `lun0` | Block devices exported by the target, with a fixed `wwn` (UUID) |
 | `iscsi_target_chap_enabled` | `true` | One-way CHAP on every ACL |
 

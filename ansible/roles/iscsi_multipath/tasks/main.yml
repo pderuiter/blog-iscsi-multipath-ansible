@@ -1,4 +1,14 @@
 ---
+- name: Check that the LUN WWID is set
+  ansible.builtin.assert:
+    that:
+      - iscsi_wwid | length > 0
+    fail_msg: >-
+      iscsi_wwid is not set. Log in to the target once, read the WWID
+      with 'multipath -ll' or '/lib/udev/scsi_id -g -u -d /dev/sdX'
+      and set iscsi_wwid in your inventory (for example group_vars/all/vars.yml).
+    quiet: true
+
 - name: Install iSCSI and multipath packages
   ansible.builtin.apt:
     name:
@@ -13,7 +23,7 @@
     dest: /etc/iscsi/iscsid.conf
     owner: root
     group: root
-    mode: '0644'
+    mode: '0600'  # root only: the file contains the CHAP password
   no_log: true  # the rendered file contains the CHAP password
 
 - name: Deploy Multipath configuration

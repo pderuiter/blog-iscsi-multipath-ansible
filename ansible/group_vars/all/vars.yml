@@ -7,6 +7,12 @@ iscsi_target_name: "iqn.2025-03.com.example:storage"
 iscsi_chap_username: "{{ vault_iscsi_chap_username }}"
 iscsi_chap_password: "{{ vault_iscsi_chap_password }}"
 
+# The LUN WWID for multipath.conf. The post reads it with `multipath -ll`. The iscsi_target
+# role below gives the LUN a fixed serial (wwn), so the WWID is known in advance:
+# "36001405" + the first 25 hex digits of the wwn. With your own target, put the WWID
+# from `multipath -ll` here instead.
+iscsi_wwid: "{{ '36001405' ~ (iscsi_target_luns[0].wwn | replace('-', ''))[:25] }}"
+
 # Target side (role iscsi_target), so you can build both ends.
 iscsi_target_iqn: "{{ iscsi_target_name }}"
 iscsi_target_portals: "{{ iscsi_target_ips }}"
